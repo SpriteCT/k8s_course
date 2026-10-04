@@ -11,13 +11,15 @@
 
 | Что нужно | Для тем | Как даём |
 |---|---|---|
-| Аудит-лог API (audit policy + extraMounts) | 01-01, 07-04 | вариант конфига `env/kind-audit.yaml` |
-| NetworkPolicy | 04-03, 07-05 | штатный kindnet применяет политики — проверено, доп. CNI не нужен |
+| Аудит-лог API (audit policy + extraMounts) | 01-01, 08-01 | вариант конфига `env/kind-audit.yaml` |
+| NetworkPolicy | 04-03, 08-02 | штатный kindnet применяет политики — проверено, доп. CNI не нужен |
 | LoadBalancer | 04-01 | `cloud-provider-kind` (локальная замена облаку) |
 | Ingress/Gateway-контроллер | 04-02 | проброс портов уже в `kind-config.yaml` + установка контроллера скриптом |
-| metrics-server | 08-01, 08-02 | `env/metrics-server.sh` (с `--kubelet-insecure-tls`) |
-| Trivy / cosign / Kyverno / Falco | модуль 07 | установка в начале соответствующего урока |
-| Отдельные ВМ (kubeadm) | 12-01 | честно: в kind не делается, нужны Multipass/Vagrant |
+| Одноразовый кластер для атак | 08-02 | `./env/down.sh && ./env/up.sh` — атаки воспроизводятся не на кластере с `shop` |
+| metrics-server | 09-01, 09-02 | `env/metrics-server.sh` (с `--kubelet-insecure-tls`) |
+| Kyverno | 07-03 | установка в начале урока |
+| Trivy / cosign / Falco | модуль 08 | установка в начале соответствующего урока |
+| Отдельные ВМ (kubeadm) | 13-01 | честно: в kind не делается, нужны Multipass/Vagrant |
 
 Теоретические темы, которые на kind не показать вживую (VPA, Cluster Autoscaler), помечены в уроках как теоретические.
 
@@ -31,11 +33,12 @@
 | 04 | DNS-имена, Ingress/Gateway, NetworkPolicy между ярусами |
 | 05 | redis на StatefulSet с постоянным томом |
 | 06 | requests/limits, QoS, PDB, анти-аффинити реплик |
-| 07 | least-privilege RBAC, restricted Pod Security, скан образов, аудит и runtime-детект |
-| 08 | метрики, HPA для api |
-| 09 | упаковка в Helm/Kustomize |
-| 10 | выкатка через Argo CD, мониторинг в Grafana |
-| 11 | полный прод-вариант с харденингом |
+| 07 | least-privilege RBAC, restricted Pod Security, admission-политики |
+| 08 | `shop` под аудитом; его образы сканируются и подписываются; на него пишутся runtime-правила; на нём же отрабатываются атаки и детект |
+| 09 | метрики, HPA для api |
+| 10 | упаковка в Helm/Kustomize |
+| 11 | выкатка через Argo CD, мониторинг в Grafana |
+| 12 | полный прод-вариант с харденингом |
 
 ---
 
@@ -107,21 +110,29 @@
 | 02-placement | nodeSelector, affinity/anti-affinity, taints/tolerations, topologySpreadConstraints | todo |
 | 03-availability | PodDisruptionBudget, PriorityClass, drain/cordon | todo |
 
-## 07-security — Безопасность
-**После модуля:** выдаёте минимальные права, запускаете контейнеры без лишних привилегий, видите действия в аудит-логе, узнаёте типовые атаки и умеете их детектировать и блокировать.
-**Пререквизиты:** 01-basics, 02-workloads, 03-config, 04-networking, 06-scheduling. Самый большой модуль курса.
+## 07-security — Защита кластера
+**После модуля:** выдаёте минимальные права, запускаете контейнеры без лишних привилегий и навязываете правила через admission.
+**Пререквизиты:** 01-basics, 02-workloads, 03-config, 04-networking, 06-scheduling.
 
 | Тема | Содержание | Статус |
 |---|---|---|
 | 01-rbac | ServiceAccount, Role/ClusterRole, Bindings, `kubectl auth can-i`; токены SA; пути эскалации привилегий через права | todo |
-| 02-pod-security | securityContext, Linux capabilities, seccomp, runAsNonRoot, readOnlyRootFilesystem; Pod Security Standards/Admission; как устроен побег из контейнера и что его включает (privileged, hostPath, hostPID) | todo |
+| 02-pod-security | securityContext, Linux capabilities, seccomp, runAsNonRoot, readOnlyRootFilesystem; Pod Security Standards/Admission; что включает побег из контейнера (privileged, hostPath, hostPID) | todo |
 | 03-admission-policy | ValidatingAdmissionPolicy (CEL), идея admission-вебхуков; Kyverno как policy-engine (запрет latest, обязательные requests, запрет privileged) | todo |
-| 04-audit-logging | Аудит API в kind: audit policy, уровни, что и зачем логировать; чтение событий; что в логе оставляет типовая атака | todo |
-| 05-threat-model-attacks | Модель угроз кластера, MITRE ATT&CK for Containers; разбор и воспроизведение в изолированной лабе: открытый API/kubelet, злоупотребление токеном SA, privileged-побег, кража секретов, боковое перемещение — каждая связка «атака → след в аудите → защита» | todo |
-| 06-supply-chain | Скан образов (Trivy), SBOM/KBOM; подпись образов (cosign) и проверка подписи на admission; запрет неподписанных и уязвимых образов | todo |
-| 07-runtime-security | Falco (modern eBPF): детект подозрительного поведения в рантайме (shell в контейнере, доступ к `/etc/shadow`, неожиданный исходящий трафик); как правило превращается в алерт | todo |
 
-## 08-operations — Наблюдаемость, масштабирование, отладка
+## 08-threat-detection — Атаки, аудит и детектирование
+**После модуля:** читаете аудит-лог, воспроизводите типовые атаки на кластер, видите их следы и закрываете их защитой из модуля 07.
+**Пререквизиты:** весь модуль 07. Наступательные лабы выполняются на **одноразовом** кластере (`./env/down.sh && ./env/up.sh`), а не на том, где живёт `shop`.
+**Этика:** материал для защиты собственных/учебных кластеров. Все атаки — только в локальной лабе.
+
+| Тема | Содержание | Статус |
+|---|---|---|
+| 01-audit-logging | Аудит API в kind: audit policy, уровни, что и зачем логировать; чтение и фильтрация событий; базовые линии «нормального» поведения | todo |
+| 02-attacks | Модель угроз, MITRE ATT&CK for Containers; воспроизведение в изолированном кластере: открытый kubelet/API, злоупотребление токеном SA, побег из privileged-контейнера через hostPath, кража секретов, боковое перемещение. Для каждой атаки — след в аудите (из 08-01) и перекрытие средствами модуля 07 | todo |
+| 03-supply-chain | Скан образов (Trivy), SBOM/KBOM; подпись образов (cosign) и проверка подписи на admission; запрет неподписанных и уязвимых образов | todo |
+| 04-runtime-security | Falco (modern eBPF): детект поведения в рантайме (shell в контейнере, чтение `/etc/shadow`, неожиданный egress); как срабатывание превращается в алерт; ловим атаки из 08-02 вживую | todo |
+
+## 09-operations — Наблюдаемость, масштабирование, отладка
 **После модуля:** видите, что происходит с нагрузкой, масштабируете её и системно чините инциденты.
 **Пререквизиты:** 02-workloads, 06-scheduling.
 
@@ -131,7 +142,7 @@
 | 02-autoscaling | HPA на метриках; VPA и Cluster Autoscaler — обзорно/теоретически (на kind не демонстрируются) | todo |
 | 03-troubleshooting | Систематическая отладка: Pending, CrashLoopBackOff, ImagePullBackOff, OOMKilled, сервис не отвечает; сведение приёмов из всех модулей | todo |
 
-## 09-packaging — Пакетирование
+## 10-packaging — Пакетирование
 **После модуля:** собираете конфигурацию `shop` в переиспользуемый пакет.
 **Пререквизиты:** 03-config, 04-networking.
 
@@ -140,9 +151,9 @@
 | 01-kustomize | base/overlays, patches, генераторы | todo |
 | 02-helm | Чарты, values, шаблоны, релизы; свой чарт для `shop` | todo |
 
-## 10-ecosystem — Расширение и экосистема
+## 11-ecosystem — Расширение и экосистема
 **После модуля:** ставите операторы, выкатываете из git и собираете метрики.
-**Пререквизиты:** 07-security (CRD/RBAC), 09-packaging.
+**Пререквизиты:** 07-security (CRD/RBAC), 10-packaging.
 
 | Тема | Содержание | Статус |
 |---|---|---|
@@ -150,7 +161,7 @@
 | 02-gitops | Argo CD: приложение из git, синхронизация, откат; дрейф и его обнаружение | todo |
 | 03-monitoring | Prometheus + Grafana (kube-prometheus-stack), ServiceMonitor; дашборд и алерт для `shop` | todo |
 
-## 11-final — Финальный проект
+## 12-final — Финальный проект
 **После модуля:** разворачиваете `shop` «как в продакшене» с харденингом.
 **Пререквизиты:** все предыдущие модули.
 
@@ -158,7 +169,7 @@
 |---|---|---|
 | 01-final-project | `shop` в прод-виде: Helm/Kustomize, Gateway + TLS, NetworkPolicy default-deny, least-privilege RBAC, restricted Pod Security, HPA, PDB, скан образов на admission, аудит и runtime-детект, мониторинг, GitOps. Проверка — `check.sh` (функциональность) + security-check (харденинг) | todo |
 
-## 12-cluster-admin — Администрирование кластера (опционально, уровень CKA)
+## 13-cluster-admin — Администрирование кластера (опционально, уровень CKA)
 Вне основной линии: отдельный навык для тех, кто хочет понимать кластер «снизу». Требует ВМ.
 
 | Тема | Содержание | Статус |
