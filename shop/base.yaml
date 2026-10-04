@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  labels: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: redis}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: redis}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: redis}
+    spec:
+      containers:
+        - name: redis
+          image: redis:7.4-alpine
+          ports: [{containerPort: 6379, name: redis}]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  labels: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: redis}
+spec:
+  selector: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: redis}
+  ports: [{port: 6379, targetPort: redis}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  labels: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: api}
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: api}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: api}
+    spec:
+      containers:
+        - name: api
+          image: hashicorp/http-echo:1.0
+          args: ["-listen=:8080", "-text=shop api ok"]
+          ports: [{containerPort: 8080, name: http}]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  labels: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: api}
+spec:
+  selector: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: api}
+  ports: [{port: 80, targetPort: http}]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  labels: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: frontend}
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: frontend}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: frontend}
+    spec:
+      containers:
+        - name: frontend
+          image: nginx:1.27-alpine
+          ports: [{containerPort: 80, name: http}]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  labels: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: frontend}
+spec:
+  selector: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: frontend}
+  ports: [{port: 80, targetPort: http}]
