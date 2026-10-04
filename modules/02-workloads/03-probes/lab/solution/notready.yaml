@@ -1,0 +1,29 @@
+# readiness всегда падает (порт 8081 закрыт) -> pod в эндпоинтах помечен ready=false.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: notready
+  labels:
+    app: web
+spec:
+  containers:
+    - name: web
+      image: nginx:1.27-alpine
+      ports:
+        - containerPort: 80
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 8081
+        periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  selector:
+    app: web
+  ports:
+    - port: 80
+      targetPort: 80

@@ -1,0 +1,18 @@
+# pod api перезапускается: livenessProbe бьёт не на тот порт и убивает живой контейнер.
+# Почините только пробу (контейнер слушает 80).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: api
+spec:
+  containers:
+    - name: web
+      image: nginx:1.27-alpine
+      ports:
+        - containerPort: 80
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 9999            # <-- контейнер слушает 80, а не 9999
+        periodSeconds: 5
+        failureThreshold: 1
