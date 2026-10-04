@@ -22,8 +22,8 @@ kubectl get pods -l 'app=shop,!env'        --no-headers | wc -l   # no-env-count
 ## Задание 3. Починить связь по селектору
 Проблема — опечатка в метке pod: `tier: frontnend` вместо `frontend`, поэтому `selector` Service (`tier=frontend`) его не находит, и у Service нет эндпоинтов.
 ```bash
-kubectl get svc shop-front -o jsonpath='{.spec.selector}'   # app=shop,tier=frontend
-kubectl get pod front-x --show-labels                       # tier=frontnend  <-- опечатка
+kubectl get svc shop-front -o jsonpath='{.spec.selector}'   # app=web,tier=frontend
+kubectl get pod front-x --show-labels                       # app=web,tier=frontnend  <-- опечатка
 kubectl label pod front-x tier=frontend --overwrite         # починка на месте
 kubectl get endpoints shop-front                            # теперь есть адрес pod
 ```
