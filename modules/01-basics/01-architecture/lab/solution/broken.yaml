@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: broken
+spec:
+  schedulerName: default-scheduler   # было default-schedular — такого планировщика нет
+  containers:
+    - name: web
+      image: nginx:1.27-alpine       # было nginx:1.27-alpne — такого тега нет

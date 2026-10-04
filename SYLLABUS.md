@@ -10,7 +10,7 @@
 ## 01-basics — Основы
 | Тема | Содержание | Статус |
 |---|---|---|
-| 01-architecture | Control plane (api-server, etcd, scheduler, controller-manager), узлы (kubelet, kube-proxy, container runtime); декларативная модель и reconcile loop | todo |
+| 01-architecture | Control plane (api-server, etcd, scheduler, controller-manager), узлы (kubelet, kube-proxy, container runtime); декларативная модель и reconcile loop | draft |
 | 02-api-and-kubectl | Объекты и API-группы, `apiVersion/kind/metadata/spec/status`, `get/describe/explain/apply/delete`, `-o yaml/jsonpath`, `--dry-run` | todo |
 | 03-namespaces-labels | Namespaces, labels и selectors, annotations | todo |
 

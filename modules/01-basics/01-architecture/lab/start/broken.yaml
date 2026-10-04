@@ -1,0 +1,10 @@
+# Этот pod должен работать, но не работает. Найдите причину (их больше одной).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: broken
+spec:
+  schedulerName: default-schedular
+  containers:
+    - name: web
+      image: nginx:1.27-alpne

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: manual
+spec:
+  # Узел задан сразу — scheduler такой pod не обрабатывает,
+  # поэтому taint control-plane (его проверяет scheduler) не мешает.
+  nodeName: k8s-course-control-plane
+  containers:
+    - name: web
+      image: nginx:1.27-alpine
