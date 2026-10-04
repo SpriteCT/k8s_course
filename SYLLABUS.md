@@ -12,12 +12,13 @@
 | Что нужно | Для тем | Как даём |
 |---|---|---|
 | Аудит-лог API (audit policy + extraMounts) | 01-01, 08-01 | вариант конфига `env/kind-audit.yaml` |
-| NetworkPolicy | 04-03, 08-02 | штатный kindnet применяет политики — проверено, доп. CNI не нужен |
+| NetworkPolicy | 04-04, 08-02 | штатный kindnet применяет политики — проверено, доп. CNI не нужен |
 | LoadBalancer | 04-01 | `cloud-provider-kind` (локальная замена облаку) |
 | Ingress/Gateway-контроллер | 04-02 | проброс портов уже в `kind-config.yaml` + установка контроллера скриптом |
 | Одноразовый кластер для атак | 08-02 | `./env/down.sh && ./env/up.sh` — атаки воспроизводятся не на кластере с `shop` |
-| metrics-server | 09-01, 09-02 | `env/metrics-server.sh` (с `--kubelet-insecure-tls`) |
-| Kyverno | 07-03 | установка в начале урока |
+| metrics-server | 09-01, 09-03 | `env/metrics-server.sh` (с `--kubelet-insecure-tls`) |
+| Loki + promtail/alloy | 09-02 | установка Helm-чартом в начале урока |
+| Kyverno | 07-04 | установка в начале урока |
 | Trivy / cosign / Falco | модуль 08 | установка в начале соответствующего урока |
 | Отдельные ВМ (kubeadm) | 13-01 | честно: в kind не делается, нужны Multipass/Vagrant |
 
@@ -65,11 +66,12 @@
 
 | Тема | Содержание | Статус |
 |---|---|---|
-| 01-pods | Pod, жизненный цикл, multi-container, init- и sidecar-контейнеры, restartPolicy; Downward API; хуки postStart/preStop | todo |
-| 02-probes | liveness / readiness / startup probes; graceful shutdown; readiness показываем через Endpoints (почему под исключается из балансировки) | todo |
-| 03-deployments | ReplicaSet, Deployment, rolling update, rollback, стратегии; здесь же вводим минимальные requests в примеры `shop` | todo |
-| 04-services | ClusterIP, NodePort, headless; Endpoints/EndpointSlices; LoadBalancer через `cloud-provider-kind`. Service перенесён сюда, чтобы к приложению можно было обратиться сразу | todo |
-| 05-daemonsets-jobs | DaemonSet; Job, CronJob, параллелизм, backoffLimit. (StatefulSet перенесён в модуль 05, где есть хранилище) | todo |
+| 01-containers | Что такое контейнер изнутри: namespaces, cgroups, capabilities; что pod делит между контейнерами (network/IPC, опц. PID), pause-контейнер. Фундамент для probes, securityContext и побега из контейнера | todo |
+| 02-pods | Pod, жизненный цикл, multi-container, init- и sidecar-контейнеры, restartPolicy; Downward API; хуки postStart/preStop | todo |
+| 03-probes | liveness / readiness / startup probes; graceful shutdown; readiness показываем через Endpoints (почему под исключается из балансировки) | todo |
+| 04-deployments | ReplicaSet, Deployment, rolling update, rollback, стратегии; здесь же вводим минимальные requests в примеры `shop` | todo |
+| 05-services | ClusterIP, NodePort, headless; Endpoints/EndpointSlices; LoadBalancer через `cloud-provider-kind`. Service перенесён сюда, чтобы к приложению можно было обратиться сразу | todo |
+| 06-daemonsets-jobs | DaemonSet; Job, CronJob, параллелизм, backoffLimit. (StatefulSet перенесён в модуль 05, где есть хранилище) | todo |
 
 ## 03-config — Конфигурация
 **После модуля:** выносите настройки и секреты из образа и понимаете, почему Secret сам по себе не защита.
@@ -81,14 +83,15 @@
 | 02-secrets | Secret: типы, монтирование; ограничения (base64 ≠ шифрование); шифрование etcd at rest; обзор External Secrets / Sealed Secrets | todo |
 
 ## 04-networking — Сеть
-**После модуля:** публикуете сервис наружу по имени и ограничиваете трафик между ярусами.
-**Пререквизиты:** 02-workloads/04-services.
+**После модуля:** понимаете, как пакет идёт от pod к pod, публикуете сервис наружу по имени и ограничиваете трафик между ярусами.
+**Пререквизиты:** 02-workloads/05-services.
 
 | Тема | Содержание | Статус |
 |---|---|---|
-| 01-dns | CoreDNS, FQDN сервисов и pod, search-домены, отладка DNS | todo |
-| 02-ingress-gateway | Ingress (классика) и Gateway API; TLS; установка контроллера в kind | todo |
-| 03-network-policies | NetworkPolicy: default-deny, ingress/egress; сегментация как защита от бокового перемещения (kindnet применяет политики — проверено) | todo |
+| 01-cluster-networking | Модель сети: у каждого pod свой маршрутизируемый IP; CNI (kindnet) и cluster/pod/service CIDR; как kube-proxy реализует ClusterIP через iptables; путь пакета между узлами. Фундамент для DNS, Ingress и NetworkPolicy | todo |
+| 02-dns | CoreDNS, FQDN сервисов и pod, search-домены, отладка DNS | todo |
+| 03-ingress-gateway | Ingress (классика) и Gateway API; TLS; установка контроллера в kind | todo |
+| 04-network-policies | NetworkPolicy: default-deny, ingress/egress; сегментация как защита от бокового перемещения (kindnet применяет политики — проверено) | todo |
 
 ## 05-storage — Хранилище
 **После модуля:** даёте приложению постоянный том и понимаете жизненный цикл данных.
@@ -116,9 +119,10 @@
 
 | Тема | Содержание | Статус |
 |---|---|---|
-| 01-rbac | ServiceAccount, Role/ClusterRole, Bindings, `kubectl auth can-i`; токены SA; пути эскалации привилегий через права | todo |
-| 02-pod-security | securityContext, Linux capabilities, seccomp, runAsNonRoot, readOnlyRootFilesystem; Pod Security Standards/Admission; что включает побег из контейнера (privileged, hostPath, hostPID) | todo |
-| 03-admission-policy | ValidatingAdmissionPolicy (CEL), идея admission-вебхуков; Kyverno как policy-engine (запрет latest, обязательные requests, запрет privileged) | todo |
+| 01-authentication | Как API узнаёт, кто вы: клиентские сертификаты, bearer-токены, ServiceAccount-токены, обзор OIDC; CA кластера и TLS между компонентами; аутентификация kubelet. Аутентификация (кто) против авторизации (что можно) | todo |
+| 02-rbac | ServiceAccount, Role/ClusterRole, Bindings, `kubectl auth can-i`; токены SA; пути эскалации привилегий через права | todo |
+| 03-pod-security | securityContext, Linux capabilities, seccomp, runAsNonRoot, readOnlyRootFilesystem; Pod Security Standards/Admission; что включает побег из контейнера (privileged, hostPath, hostPID) | todo |
+| 04-admission-policy | ValidatingAdmissionPolicy (CEL), идея admission-вебхуков; Kyverno как policy-engine (запрет latest, обязательные requests, запрет privileged) | todo |
 
 ## 08-threat-detection — Атаки, аудит и детектирование
 **После модуля:** читаете аудит-лог, воспроизводите типовые атаки на кластер, видите их следы и закрываете их защитой из модуля 07.
@@ -139,8 +143,9 @@
 | Тема | Содержание | Статус |
 |---|---|---|
 | 01-observability | logs, events, metrics-server, `kubectl top`, `kubectl debug` (ephemeral containers) | todo |
-| 02-autoscaling | HPA на метриках; VPA и Cluster Autoscaler — обзорно/теоретически (на kind не демонстрируются) | todo |
-| 03-troubleshooting | Систематическая отладка: Pending, CrashLoopBackOff, ImagePullBackOff, OOMKilled, сервис не отвечает; сведение приёмов из всех модулей | todo |
+| 02-logging | Логи pod эфемерны и умирают вместе с pod — почему нужна агрегация; архитектура сбора логов на узле; централизованный сбор (Loki + promtail/alloy), запрос логов по лейблам; что отправлять в агрегатор, а что в аудит (08-01) | todo |
+| 03-autoscaling | HPA на метриках; VPA и Cluster Autoscaler — обзорно/теоретически (на kind не демонстрируются) | todo |
+| 04-troubleshooting | Систематическая отладка: Pending, CrashLoopBackOff, ImagePullBackOff, OOMKilled, сервис не отвечает; сведение приёмов из всех модулей | todo |
 
 ## 10-packaging — Пакетирование
 **После модуля:** собираете конфигурацию `shop` в переиспользуемый пакет.
