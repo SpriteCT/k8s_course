@@ -1,0 +1,28 @@
+# Учебный кластер: 1 control-plane + 2 worker.
+# Версии зафиксированы: kind v0.33.0, Kubernetes v1.37.0.
+# Образ узла и digest взяты из release notes kind v0.33.0 — при смене версии kind
+# обновите все три image и kubectl (env/vm-setup.sh) в пределах ±1 minor.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: k8s-course
+nodes:
+  - role: control-plane
+    image: kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5
+    labels:
+      ingress-ready: "true"
+    extraPortMappings:
+      # HTTP/HTTPS для Ingress / Gateway (модуль 04)
+      - containerPort: 80
+        hostPort: 8080
+        protocol: TCP
+      - containerPort: 443
+        hostPort: 8443
+        protocol: TCP
+      # Диапазон для NodePort-лаб
+      - containerPort: 30080
+        hostPort: 30080
+        protocol: TCP
+  - role: worker
+    image: kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5
+  - role: worker
+    image: kindest/node:v1.37.0@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5
