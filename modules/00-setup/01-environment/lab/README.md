@@ -108,4 +108,4 @@ kubectl -n lab-00-01 create configmap answers \
 ```bash
 ./cleanup.sh
 ```
-Скрипт удалит namespace `lab-00-01` и контекст `lab-00-01`, вернёт текущим контекст `kind-k8s-course`. Переменную `KUBECONFIG` из задания 3 уберите сами: `unset KUBECONFIG`. Чтобы пройти задание 3 заново, верните исходный файл: `git checkout -- start/kubeconfig-lab.yaml`.
+Скрипт удалит namespace `lab-00-01` и контекст `lab-00-01`, вернёт текущим контекст `kind-k8s-course`, вернёт namespace `default` контекстам, которые остались смотреть в `lab-00-01`, и восстановит исходный `start/kubeconfig-lab.yaml`. Переменную `KUBECONFIG` из задания 3 скрипт снять не может — сделайте это сами: `unset KUBECONFIG`.
