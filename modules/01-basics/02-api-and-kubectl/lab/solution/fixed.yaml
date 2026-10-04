@@ -1,0 +1,11 @@
+# Исправленный broken.yaml: apiVersion core v1, поле containers (мн. ч.), порт числом.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fixed
+spec:
+  containers:
+    - name: web
+      image: nginx:1.27-alpine
+      ports:
+        - containerPort: 80

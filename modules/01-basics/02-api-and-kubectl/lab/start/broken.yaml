@@ -1,0 +1,11 @@
+# Этот pod должен работать, но api-server отвергает манифест. Причин несколько.
+apiVersion: apps/v1
+kind: Pod
+metadata:
+  name: fixed
+spec:
+  container:
+    - name: web
+      image: nginx:1.27-alpine
+      ports:
+        - containerPort: "80"
