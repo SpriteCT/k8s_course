@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: shared
+spec:
+  containers:
+    - name: server
+      image: nginx:1.27-alpine
+      ports:
+        - containerPort: 80
+    - name: client
+      image: busybox:1.36
+      command: ["sh", "-c", "sleep 3600"]

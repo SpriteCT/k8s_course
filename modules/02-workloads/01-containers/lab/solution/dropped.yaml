@@ -1,0 +1,14 @@
+# Задание 4: контейнер без единой capability (под root всё равно работает).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dropped
+spec:
+  containers:
+    - name: web
+      image: nginx:1.27-alpine
+      ports:
+        - containerPort: 80
+      securityContext:
+        capabilities:
+          drop: ["ALL"]
