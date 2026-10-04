@@ -1,0 +1,25 @@
+# Deployment api не выходит в рабочее состояние: опечатка в теге образа.
+# Добейтесь 2/2 готовых реплик на nginx:1.27-alpine (см. README, задание 3).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api
+          image: nginx:1.27-alpne          # опечатка в теге
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
