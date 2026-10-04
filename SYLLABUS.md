@@ -5,7 +5,7 @@
 ## 00-setup — Окружение
 | Тема | Содержание | Статус |
 |---|---|---|
-| 01-environment | Docker, kind, kubectl, k9s; подъём кластера из `env/`; kubeconfig и контексты | todo |
+| 01-environment | Docker, kind, kubectl, k9s; подъём кластера из `env/`; kubeconfig и контексты | draft |
 
 ## 01-basics — Основы
 | Тема | Содержание | Статус |
