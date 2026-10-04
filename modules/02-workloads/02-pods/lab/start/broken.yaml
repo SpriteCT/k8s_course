@@ -1,0 +1,24 @@
+# pod застревает: init-контейнер падает. Почините команду init (см. README, задание 3).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fixme
+spec:
+  initContainers:
+    - name: setup
+      image: busybox:1.36
+      command: ["sh", "-c", "ecko '<h1>fixed</h1>' > /html/index.html"]   # опечатка в утилите
+      volumeMounts:
+        - name: html
+          mountPath: /html
+  containers:
+    - name: nginx
+      image: nginx:1.27-alpine
+      ports:
+        - containerPort: 80
+      volumeMounts:
+        - name: html
+          mountPath: /usr/share/nginx/html
+  volumes:
+    - name: html
+      emptyDir: {}

@@ -67,7 +67,7 @@
 | Тема | Содержание | Статус |
 |---|---|---|
 | 01-containers | Что такое контейнер изнутри: namespaces, cgroups, capabilities; что pod делит между контейнерами (network/IPC, опц. PID), pause-контейнер. Фундамент для probes, securityContext и побега из контейнера | reviewed |
-| 02-pods | Pod, жизненный цикл, multi-container, init- и sidecar-контейнеры, restartPolicy; Downward API; хуки postStart/preStop | todo |
+| 02-pods | Pod, жизненный цикл, multi-container, init- и sidecar-контейнеры, restartPolicy; Downward API; хуки postStart/preStop | reviewed |
 | 03-probes | liveness / readiness / startup probes; graceful shutdown; readiness показываем через Endpoints (почему под исключается из балансировки) | todo |
 | 04-deployments | ReplicaSet, Deployment, rolling update, rollback, стратегии; здесь же вводим минимальные requests в примеры `shop` | todo |
 | 05-services | ClusterIP, NodePort, headless; Endpoints/EndpointSlices; LoadBalancer через `cloud-provider-kind`. Service перенесён сюда, чтобы к приложению можно было обратиться сразу | todo |

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: info
+spec:
+  containers:
+    - name: info
+      image: busybox:1.36
+      command: ["sh", "-c", "sleep 3600"]
+      env:
+        - name: MY_NODE
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
