@@ -70,7 +70,7 @@
 | 02-pods | Pod, жизненный цикл, multi-container, init- и sidecar-контейнеры, restartPolicy; Downward API; хуки postStart/preStop | reviewed |
 | 03-probes | liveness / readiness / startup probes; graceful shutdown; readiness показываем через Endpoints (почему под исключается из балансировки) | reviewed |
 | 04-deployments | ReplicaSet, Deployment, rolling update, rollback, стратегии; здесь же вводим минимальные requests в примеры `shop` | reviewed |
-| 05-services | ClusterIP, NodePort, headless; Endpoints/EndpointSlices; LoadBalancer через `cloud-provider-kind`. Service перенесён сюда, чтобы к приложению можно было обратиться сразу | todo |
+| 05-services | ClusterIP, NodePort, headless; Endpoints/EndpointSlices; LoadBalancer через `cloud-provider-kind`. Service перенесён сюда, чтобы к приложению можно было обратиться сразу | reviewed |
 | 06-daemonsets-jobs | DaemonSet; Job, CronJob, параллелизм, backoffLimit. (StatefulSet перенесён в модуль 05, где есть хранилище) | todo |
 
 ## 03-config — Конфигурация

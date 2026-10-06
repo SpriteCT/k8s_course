@@ -1,0 +1,9 @@
+# Задание 4: исправленный Service api (Deployment из start/broken.yaml не менялся).
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  labels: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: api}
+spec:
+  selector: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: api}  # было: backend
+  ports: [{port: 80, targetPort: http}]                                           # было: 80

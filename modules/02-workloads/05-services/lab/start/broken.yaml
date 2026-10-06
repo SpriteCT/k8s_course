@@ -1,0 +1,30 @@
+# Ярус api из shop. Pod готовы, но http://api не отвечает.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  labels: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: api}
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: api}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: api}
+    spec:
+      containers:
+        - name: api
+          image: hashicorp/http-echo:1.0
+          args: ["-listen=:8080", "-text=shop api ok"]
+          ports: [{containerPort: 8080, name: http}]
+          readinessProbe:
+            tcpSocket: {port: http}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  labels: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: api}
+spec:
+  selector: {app.kubernetes.io/part-of: shop, app.kubernetes.io/component: backend}
+  ports: [{port: 80, targetPort: 80}]
