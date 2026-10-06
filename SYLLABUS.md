@@ -57,7 +57,7 @@
 | Тема | Содержание | Статус |
 |---|---|---|
 | 01-architecture | Control plane (api-server, etcd, scheduler, controller-manager), узлы (kubelet, kube-proxy, runtime); декларативная модель и reconcile loop; owner references, finalizers, garbage collection; где проходят границы доверия | reviewed |
-| 02-api-and-kubectl | Объекты и API-группы, `apiVersion/kind/metadata/spec/status`; `get/describe/explain/apply/delete`, `-o yaml/jsonpath`, `--dry-run`; `port-forward`/`exec`/`logs` как первый доступ к приложению; каждый вызов `kubectl` — это запрос к API (мостик к аудиту) | reviewed |
+| 02-api-and-kubectl | Объекты и API-группы, `apiVersion/kind/metadata/spec/status`; `get/describe/explain/apply/delete`, `-o yaml/jsonpath`, `--dry-run`; `port-forward`/`exec`/`logs` как первый доступ к приложению; каждый вызов `kubectl` — это запрос к API (мостик к аудиту) | done |
 | 03-namespaces-labels | Namespaces как граница, labels и selectors, annotations | reviewed |
 
 ## 02-workloads — Рабочие нагрузки
