@@ -71,7 +71,7 @@
 | 03-probes | liveness / readiness / startup probes; graceful shutdown; readiness показываем через Endpoints (почему под исключается из балансировки) | reviewed |
 | 04-deployments | ReplicaSet, Deployment, rolling update, rollback, стратегии; здесь же вводим минимальные requests в примеры `shop` | reviewed |
 | 05-services | ClusterIP, NodePort, headless; Endpoints/EndpointSlices; LoadBalancer через `cloud-provider-kind`. Service перенесён сюда, чтобы к приложению можно было обратиться сразу | reviewed |
-| 06-daemonsets-jobs | DaemonSet; Job, CronJob, параллелизм, backoffLimit. (StatefulSet перенесён в модуль 05, где есть хранилище) | todo |
+| 06-daemonsets-jobs | DaemonSet; Job, CronJob, параллелизм, backoffLimit. (StatefulSet перенесён в модуль 05, где есть хранилище) | reviewed |
 
 ## 03-config — Конфигурация
 **После модуля:** выносите настройки и секреты из образа и понимаете, почему Secret сам по себе не защита.
