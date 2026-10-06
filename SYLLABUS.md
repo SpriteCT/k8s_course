@@ -13,7 +13,7 @@
 |---|---|---|
 | Аудит-лог API (audit policy + extraMounts) | 01-01, 08-01 | вариант конфига `env/kind-audit.yaml` |
 | NetworkPolicy | 04-04, 08-02 | штатный kindnet применяет политики — проверено, доп. CNI не нужен |
-| LoadBalancer | 02-05 | `cloud-provider-kind` (локальная замена облаку) |
+| LoadBalancer | 02-05 | `env/cloud-provider-kind.sh` — cloud-provider-kind v0.12.0 контейнером в сети kind (локальная замена облаку); `env/down.sh` его останавливает |
 | Ingress/Gateway-контроллер | 04-03 | проброс портов уже в `kind-config.yaml` + установка контроллера скриптом |
 | Одноразовый кластер для атак | 08-02 | `./env/down.sh && ./env/up.sh` — атаки воспроизводятся не на кластере с `shop` |
 | metrics-server | 09-01, 09-03 | `env/metrics-server.sh` (с `--kubelet-insecure-tls`) |
